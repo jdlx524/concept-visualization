@@ -1,0 +1,8 @@
+.node {
+  width: 100px;
+  height: 50px;
+  border: 1px solid black;
+  background-color: lightgray;
+  text-align: center;
+  line-height: 50px;
+}
