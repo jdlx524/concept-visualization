@@ -1,26 +1,29 @@
 const instance = jsPlumb.getInstance();
+// Get the data in Nodes table
 var myDataElement = document.getElementById("node_data");
 var nodeText = myDataElement.dataset.nodeTexts.split(',');
 var cleanNodeText = [];
-
+let common2 = {
+    isSource: true,
+    isTarget: true,
+    maxConnections: 2,
+}
 for (var i = 0; i < nodeText.length; i++) {
     var cleanText = nodeText[i].replace(/^[^\w]+|[^\w]+$/g, '');
     cleanNodeText.push(cleanText);
 }
-
-
+// Get the data in Edges table
 myDataElement = document.getElementById("edge_data");
 var edge = [];
 if(myDataElement) {
     edge = myDataElement.dataset.nodeTexts.split(',');
 }
 var cleanEdge = [];
-
 for (var i = 0; i < edge.length; i++) {
     var cleanText = edge[i].replace(/^[^\w]+|[^\w]+$/g, '');
     cleanEdge.push(cleanText);
 }
-
+// Set create and save buttons
 const input = document.createElement('input');
 input.type = "text";
 document.body.appendChild(input);
@@ -30,60 +33,11 @@ document.body.appendChild(create);
 const save = document.createElement('button');
 save.textContent = "save";
 document.body.appendChild(save);
-
+// Generate initial case
 for (const nodeId in cleanNodeText) {
   create_node(cleanNodeText[nodeId],false);
 }
-
 const nodes = document.querySelectorAll('.node');
-console.log(nodes)
-let common2 = {
-    isSource: true,
-    isTarget: true,
-    maxConnections: 2,
-}
-// instance.bind("connection", function(info) {
-//   var sourceId = info.sourceId;
-//   var targetId = info.targetId;
-//
-//     var existingConnection = instance.select({
-//       source: sourceId,
-//       target: targetId
-//     }).length > 1;
-//
-//     if (!existingConnection) {
-//       cleanEdge.push(sourceId+'-'+targetId)
-//     }
-// });
-// instance.bind("connectionDetached", function(info) {
-//   var sourceId = info.sourceId;
-//   var targetId = info.targetId;
-//   cleanEdge = cleanEdge.filter(str => !str.match(sourceId+'-'+targetId));
-//   console.log(cleanEdge);
-// });
-// instance.ready(() => {
-//   instance.connect({
-//     source: 'node1',
-//     target: 'node2',
-//     endpoint: 'Dot',
-//   });
-//   instance.connect({
-//     source: 'node1',
-//     target: 'node3',
-//     endpoint: 'Dot'
-//   });
-//   instance.connect({
-//     source: 'node2',
-//     target: 'node4',
-//     endpoint: 'Dot'
-//   });
-//   instance.connect({
-//     source: 'node3',
-//     target: 'node4',
-//     endpoint: 'Dot'
-//   });
-// })
-console.log(cleanEdge)
 for(const edgeid in cleanEdge){
     const x = cleanEdge[edgeid].split('-');
     const source_nd = x[0]
@@ -94,14 +48,14 @@ for(const edgeid in cleanEdge){
     endpoint: 'Dot',
     });
 }
-
+// Deal with create event
 create.addEventListener('click',()=>{
     if(input.value){
         create_node(input.value,true);
         cleanNodeText.push(input.value);
     }
 });
-
+// Deal with save event
 save.addEventListener('click',()=>{
     var connections = instance.getAllConnections();
     cleanEdge = []
@@ -133,7 +87,7 @@ save.addEventListener('click',()=>{
       console.error(error);
     });
 })
-
+// Set connection and delete button for nodes
 nodes.forEach(node => {
     // let flag = true;
     instance.addEndpoint(node.id,{
@@ -147,7 +101,6 @@ nodes.forEach(node => {
     });
     const deleteButton = document.querySelector('#'+node.id+' button');
     node.onmousedown = function (ev) {
-        // ... existing code to track mouse movement and update node position ...
         instance.draggable(node, {
             grid: [10, 10]
         });
@@ -164,17 +117,9 @@ nodes.forEach(node => {
                 break;
             }
         }
-        // cleanEdge = cleanEdge.filter(str => !str.match(new RegExp("\\b" + num + "\\b")))
     });
-    // node.addEventListener('click', function(e) {
-    //     const button1 = createButton('Button 1');
-    //     const button2 = createButton('Button 2');
-    //     // 将按钮附加到节点上
-    //     node.appendChild(button1);
-    //     node.appendChild(button2);
-    // });
 });
-
+// Helper function for creating nodes
 function create_node(name, flag){
     const nodeElement = document.createElement('div');
   nodeElement.classList.add('node');
